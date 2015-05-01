@@ -1,10 +1,32 @@
 import r from 'rethinkdb';
 import Router from 'koa-router';
+import moment from 'moment';
+import parse from 'co-body';
+import http from 'http';
 
 let router = Router();
 router.get('/bills', get);
+router.post('/bills', create);
 
-function * createIndex (table, indexName) {
+function * get (next) {
+  ensureIndex('bills', 'createdAt');
+  try {
+    let cursor = yield buildQuery.call(this);
+    this._results = yield cursor.toArray();
+  } catch (e) {
+    errorHandle.call(this, e);
+  }
+  yield next;
+}
+
+function * create (next) {
+  let body = yield parse.json(this);
+  console.log(body);
+  this._results = body;
+  yield next;
+}
+
+function * ensureIndex (table, indexName) {
   let indexList = yield r.table('bills').indexList().run(this._rdbConn);
   if (indexList.some(item => item === indexName)) {
     console.log(`${indexName} exists`);
@@ -14,18 +36,29 @@ function * createIndex (table, indexName) {
   }
 }
 
-function * get (next) {
-  createIndex('bills', 'createdAt');
-  try {
-    var cursor = yield r.table('bills').orderBy({index: r.desc('createdAt')}).limit(20).run(this._rdbConn);
-    var result = yield cursor.toArray();
-    this.body = result;
-  } catch (e) {
-    /* handle error */
-    this.state = 500;
-    this.body = e.message || http.STATUS_CODES[this.status];
-  }
-  yield next;
+function * buildQuery () {
+  let {start, end} = getDate.call(this);
+  var cursor = yield r
+    .table('bills')
+    .orderBy({index: r.desc('createdAt')})
+    .between(r.epochTime(start), r.epochTime(end), {index: 'createdAt'})
+    .limit(100)
+    .run(this._rdbConn);
+  return cursor;
+}
+
+function errorHandle (e) {
+  console.log(e);
+  this.error = {};
+  this.error.state = 500;
+  this.error.message = e.message || http.STATUS_CODES[this.status];
+}
+
+function getDate () {
+  let mDate = moment(this.qs.date, 'YYYY-MM-DD');
+  let start = mDate.valueOf() / 1000;
+  let end = mDate.add(1, 'days').valueOf() / 1000;
+  return {start, end};
 }
 
 export default router.middleware();

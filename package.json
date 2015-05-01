@@ -10,11 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "co": "^4.5.2",
+    "co-body": "^1.2.0",
     "koa": "^0.19.1",
     "koa-compose": "^2.3.0",
     "koa-cors": "0.0.14",
     "koa-router": "^4.3.2",
     "lodash": "^3.7.0",
+    "moment": "^2.10.2",
     "rethinkdb": "^2.0.0"
   }
 }
