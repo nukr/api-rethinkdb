@@ -1,8 +1,7 @@
 import r from 'rethinkdb';
-import config from './config';
 
-class Database {
-  *createConnection (next) {
+export default function (config) {
+  return function * rethinkdb(next) {
     try {
       let conn = yield r.connect(config.rethinkdb);
       this._rdbConn = conn;
@@ -11,11 +10,7 @@ class Database {
       this.body = e.message || http.STATUS_CODES[this.status];
     }
     yield next;
-  }
-
-  *closeConnection (next) {
     this._rdbConn.close();
-  }
+  };
 }
 
-export default Database;

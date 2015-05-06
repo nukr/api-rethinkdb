@@ -37,7 +37,7 @@ function * ensureIndex (table, indexName) {
 }
 
 function * buildQuery () {
-  let {start, end} = getDate.call(this);
+  let {start, end} = getEpochTime.call(this);
   var cursor = yield r
     .table('bills')
     .orderBy({index: r.desc('createdAt')})
@@ -54,8 +54,8 @@ function errorHandle (e) {
   this.error.message = e.message || http.STATUS_CODES[this.status];
 }
 
-function getDate () {
-  let mDate = moment(this.qs.date, 'YYYY-MM-DD');
+function getEpochTime () {
+  let mDate = moment(this.query.date, 'YYYY-MM-DD');
   let start = mDate.valueOf() / 1000;
   let end = mDate.add(1, 'days').valueOf() / 1000;
   return {start, end};
