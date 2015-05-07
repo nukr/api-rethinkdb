@@ -9,6 +9,5 @@ export default function * (next) {
       //body: this._results
     //};
   //}
-  console.log(this);
   yield next;
 }

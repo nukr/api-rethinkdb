@@ -1,7 +1,8 @@
 import r from 'rethinkdb';
+import http from 'http';
 
 export default function (config) {
-  return function * rethinkdb(next) {
+  return function * rethinkdb (next) {
     try {
       let conn = yield r.connect(config.rethinkdb);
       this._rdbConn = conn;
@@ -13,4 +14,3 @@ export default function (config) {
     this._rdbConn.close();
   };
 }
-
