@@ -9,10 +9,11 @@ router.get('/bills', get);
 router.post('/bills', create);
 
 function * get (next) {
-  ensureIndex('bills', 'createdAt');
+  console.log('hihi');
+  yield this.rethinkdb.ensureIndex('bills', 'createdAt');
   try {
     let cursor = yield buildQuery.call(this);
-    this._results = yield cursor.toArray();
+    this.body = yield cursor.toArray();
   } catch (e) {
     errorHandle.call(this, e);
   }
@@ -24,16 +25,6 @@ function * create (next) {
   console.log(body);
   this._results = body;
   yield next;
-}
-
-function * ensureIndex (table, indexName) {
-  let indexList = yield r.table('bills').indexList().run(this._rdbConn);
-  if (indexList.some(item => item === indexName)) {
-    console.log(`${indexName} exists`);
-  } else {
-    console.log(`created ${indexName}`);
-    yield r.table(table).indexCreate(indexName).run(this._rdbConn);
-  }
 }
 
 function * buildQuery () {
