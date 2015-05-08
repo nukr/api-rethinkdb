@@ -22,7 +22,7 @@ export default function (config) {
           yield r.table(table).indexCreate(indexName).run(ctx._rdbConn);
         }
       }
-    }
+    };
     yield next;
     this._rdbConn.close();
   };
