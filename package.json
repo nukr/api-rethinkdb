@@ -20,7 +20,8 @@
     "koa-router": "^4.3.2",
     "lodash": "^3.7.0",
     "moment": "^2.10.2",
-    "rethinkdb": "^2.0.0"
+    "rethinkdb": "^2.0.0",
+    "rethinkdbdash": "^2.0.11"
   },
   "devDependencies": {
     "gulp-nodemon": "^2.0.3"

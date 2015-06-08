@@ -1,12 +1,13 @@
-import r from 'rethinkdb';
 import Router from 'koa-router';
+import rethinkdbdash from 'rethinkdbdash'
+
+let r = rethinkdbdash({host: '192.168.100.5', port: 28015})
 
 let router = Router();
 router.get('/meals', get);
 
 function * get (next) {
-  var cursor = yield r.table('meals').run(this._rdbConn);
-  this.body = yield cursor.toArray();
+  this.body = yield r.table('meals').run();
   yield next;
 }
 

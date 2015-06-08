@@ -4,7 +4,6 @@ import responseTime from 'koa-response-time';
 let app = koa();
 
 import config from './config';
-import rethinkdb from './rethinkdb';
 import routes from './routes';
 import cors from 'koa-cors';
 import hooks from './hooks';
@@ -12,7 +11,6 @@ import handleResults from './handle-results';
 
 app.use(logger());
 app.use(responseTime());
-app.use(rethinkdb(config));
 app.use(cors());
 app.use(routes);
 app.use(hooks);
