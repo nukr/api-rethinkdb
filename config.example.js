@@ -1,10 +1,9 @@
 export default {
   rethinkdb: {
-    host: '192.168.100.5',
-    port: '28015',
-    db: 'test'
+    host: 'localhost',
+    port: 28015
   },
   koa: {
     port: 12345
   }
-};
+}

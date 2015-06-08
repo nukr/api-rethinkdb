@@ -3,8 +3,10 @@ import Router from 'koa-router';
 import moment from 'moment';
 import parse from 'co-body';
 import http from 'http';
+import co from 'co'
+import config from '../config'
 
-let r = rethinkdbdash({host: '192.168.100.5'})
+let r = rethinkdbdash(config.rethinkdb)
 
 let router = Router();
 router.get('/bills', get);
