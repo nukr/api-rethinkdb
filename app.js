@@ -16,9 +16,9 @@ app.use(routes);
 app.use(hooks);
 app.use(handleResults);
 
-// app.on('error', (err, ctx) => {
-//   console.log('server error', err, ctx);
-// });
+app.on('error', (err, ctx) => {
+  console.log('server error', err, ctx);
+});
 
 app.listen(config.koa.port);
 console.log(`koa server start at ${config.koa.port}`);

@@ -1,7 +1,8 @@
 import Router from 'koa-router';
 import rethinkdbdash from 'rethinkdbdash'
+import config from '../config'
 
-let r = rethinkdbdash({host: '192.168.100.5', port: 28015})
+let r = rethinkdbdash(config.rethinkdb)
 
 let router = Router();
 router.get('/meals', get);

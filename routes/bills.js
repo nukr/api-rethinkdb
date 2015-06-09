@@ -10,10 +10,25 @@ let r = rethinkdbdash(config.rethinkdb)
 
 let router = Router();
 router.get('/bills', get);
+router.get('/statistics', statistics)
 router.post('/bills', create);
 
 function * get (next) {
-  this.body = yield steakStatisticsByName(this.query.start, this.query.end)
+  let {start, end} = this.query
+  start = start || moment().utc().hours(0).minute(0).second(0).millisecond(0).toISOString()
+  end = end || moment(start).add(1, 'd').toISOString()
+  this.body = yield r.db('taipei_steak').table('bills')
+  .between(r.ISO8601(start), r.ISO8601(end), {index: 'createdAt'})
+  .orderBy({index: 'createdAt'})
+  .run()
+  yield next;
+}
+
+function * statistics(next) {
+  let {start, end} = this.query
+  if (!start) this.throw(403, 'start date is required')
+  end = end || moment(start).add(1, 'd').toISOString()
+  this.body = yield steakStatisticsByName(start, end)
   yield next;
 }
 
@@ -30,7 +45,7 @@ function * create (next) {
  *
  */
 function steakStatisticsByName (start, end) {
-  return r.table('bills')
+  return r.db('taipei_steak').table('bills')
   .between(r.ISO8601(start), r.ISO8601(end), {index: 'createdAt'})
   .concatMap((bill) => {
     return bill('dishes')
