@@ -6,15 +6,11 @@ let app = koa();
 import config from './config';
 import routes from './routes';
 import cors from 'koa-cors';
-import hooks from './hooks';
-import handleResults from './handle-results';
 
 app.use(logger());
 app.use(responseTime());
 app.use(cors());
 app.use(routes);
-app.use(hooks);
-app.use(handleResults);
 
 app.on('error', (err, ctx) => {
   console.log('server error', err, ctx);

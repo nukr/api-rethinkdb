@@ -11,8 +11,6 @@ let r = rethinkdbdash(config.rethinkdb)
 let router = Router();
 router.get('/bills', get);
 router.post('/bills', create);
-router.del('/bills/:id', del)
-router.put('/bills', update)
 router.get('/statistics', statistics)
 
 function * get (next) {
