@@ -9,7 +9,6 @@ import config from '../config'
 let r = rethinkdbdash(config.rethinkdb)
 
 let router = Router();
-router.get('/bills/today', today);
 router.get('/bills', get);
 router.post('/bills', create);
 router.del('/bills/:id', del)
