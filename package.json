@@ -13,6 +13,8 @@
     "co": "^4.5.2",
     "co-body": "^1.2.0",
     "gulp": "^3.8.11",
+    "ioredis": "^1.5.1",
+    "jsonwebtoken": "^5.0.2",
     "koa": "^0.19.1",
     "koa-compose": "^2.3.0",
     "koa-cors": "0.0.14",
