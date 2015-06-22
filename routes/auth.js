@@ -7,11 +7,11 @@ import co from 'co'
 import Redis from 'ioredis'
 import uuid from 'node-uuid'
 import config from '../config'
+import Debug from 'debug'
 
+const debug = Debug('meepcloud:auth')
 const redis = new Redis(config.redis.port, config.redis.host)
-
 const r = rethinkdbdash({host: config.rethinkdb.host})
-
 let router = Router();
 
 router.post('/signin', signin);
@@ -19,20 +19,28 @@ router.post('/signup', signup);
 
 function * signin() {
   let {username, password} = yield parse.json(this)
-  let foundUser = yield r.db('apiTest').table('accounts').filter({username: username, password: yield hasher(password)})
+  let foundUser =
+    yield r
+      .db(config.rethinkdb.db)
+      .table('accounts')
+      .filter({
+        username: username,
+        password: yield hasher(password)
+      })
+      .pluck('services')
   if (foundUser.length > 1) {
-    console.log('duplicate user found, need to elimination')
+    debug('duplicate user found, need to elimination')
   } else if (foundUser.length === 1) {
-    console.log('成功登入')
+    debug('成功登入')
     let token = jwt.sign({test: 'success'}, 'shhhhh')
     redis.set(token, 1)
     redis.expire(token, 120)
-    this.body = token
+    this.body = foundUser
   } else if (foundUser.length === 0) {
-    console.log('使用者不存在或帳號密碼錯誤')
+    debug('使用者不存在或帳號密碼錯誤')
   } else {
-    console.log('出現奇怪東西了')
-    console.log(foundUser)
+    debug('出現奇怪東西了')
+    debug(foundUser)
   }
 }
 
@@ -41,19 +49,21 @@ function * signup () {
   if (yield isUsernameExists(username)) {
     this.body = 'user exists'
   } else {
+    let serviceUUID = uuid.v4()
+    let serviceToken = uuid.v4()
     let insertedResult = yield r
-    .db('apiTest')
+    .db(config.rethinkdb.db)
     .table('accounts')
     .insert({
       username: username,
       password: yield hasher(password),
       services: [{
         name: service,
-        token: uuid.v4()
+        dbName: serviceUUID,
+        token: serviceToken
       }]
     })
-    let dbName = insertedResult.generated_keys[0].replace(/-/g, '_')
-    yield r.dbCreate(dbName)
+    yield r.dbCreate(serviceUUID.replace(/-/g, '_'))
     this.body = 'user added'
   }
 }
@@ -69,7 +79,7 @@ const hasher = (password) => {
 
 const isUsernameExists = (username) => {
   return co(function * () {
-    let result = yield r.db('apiTest').table('accounts').filter({username: username})
+    let result = yield r.db(config.rethinkdb.db).table('accounts').filter({username: username})
     return result.length === 0 ? false : true
   })
 }

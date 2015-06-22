@@ -8,7 +8,7 @@ import cors from 'koa-cors';
 import ensureTestDbTableExists from './utils/ensureTestDbTableExists'
 import verifyToken from './utils/verifyToken'
 
-let debug = Debug('app')
+let debug = Debug('meepcloud:app')
 let app = koa();
 
 
@@ -20,7 +20,7 @@ app.use(cors())
 app.use(routes)
 
 app.on('error', (err, ctx) => {
-  debug('server error', err, ctx);
+  debug('server error', err);
 });
 
 app.listen(config.koa.port);

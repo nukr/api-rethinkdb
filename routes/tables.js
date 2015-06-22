@@ -1,7 +1,9 @@
 import Router from 'koa-router';
 import rethinkdbdash from 'rethinkdbdash'
 import config from '../config'
+import Debug from 'debug'
 
+const debug = Debug('meepcloud:tables')
 const r = rethinkdbdash({host: config.rethinkdb.host})
 const router = Router()
 
@@ -15,7 +17,7 @@ function * tableList (next) {
 }
 
 function * tableCreate (next) {
-  console.log('@@@@', this.header)
+  table('@@@@', this.header)
   yield next
 }
 

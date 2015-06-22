@@ -2,7 +2,11 @@ export default {
   rethinkdb: {
     host: 'localhost',
     port: 28015,
-    db: 'taipei_steak'
+    db: 'meepcloud_test'
+  },
+  redis: {
+    host: 'localhost',
+    port: 6379
   },
   koa: {
     port: 12345
