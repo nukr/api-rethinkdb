@@ -5,12 +5,12 @@ import jwt from 'jsonwebtoken'
 import rethinkdbdash from 'rethinkdbdash'
 import co from 'co'
 import Redis from 'ioredis'
+import uuid from 'node-uuid'
+import config from '../config'
 
-const redis = new Redis(6379, '192.168.100.5')
+const redis = new Redis(config.redis.port, config.redis.host)
 
-const r = rethinkdbdash({
-  host: '192.168.100.5'
-})
+const r = rethinkdbdash({host: config.rethinkdb.host})
 
 let router = Router();
 
@@ -37,11 +37,23 @@ function * signin() {
 }
 
 function * signup () {
-  let {username, password} = yield parse.json(this)
+  let {username, password, service} = yield parse.json(this)
   if (yield isUsernameExists(username)) {
     this.body = 'user exists'
   } else {
-    yield r.db('apiTest').table('accounts').insert({username: username, password: yield hasher(password)})
+    let insertedResult = yield r
+    .db('apiTest')
+    .table('accounts')
+    .insert({
+      username: username,
+      password: yield hasher(password),
+      services: [{
+        name: service,
+        token: uuid.v4()
+      }]
+    })
+    let dbName = insertedResult.generated_keys[0].replace(/-/g, '_')
+    yield r.dbCreate(dbName)
     this.body = 'user added'
   }
 }
