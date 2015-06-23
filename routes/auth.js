@@ -49,22 +49,18 @@ function * signup () {
   if (yield isUsernameExists(username)) {
     this.body = 'user exists'
   } else {
-    let serviceUUID = uuid.v4()
-    let serviceToken = uuid.v4()
-    let insertedResult = yield r
-    .db(config.rethinkdb.db)
-    .table('accounts')
-    .insert({
-      username: username,
-      password: yield hasher(password),
-      services: [{
-        name: service,
-        dbName: serviceUUID,
-        token: serviceToken
-      }]
-    })
-    yield r.dbCreate(serviceUUID.replace(/-/g, '_'))
-    this.body = 'user added'
+    let serviceId = uuid.v4()
+    yield r
+      .db(config.rethinkdb.db)
+      .table('accounts')
+      .insert({
+        username: username,
+        password: yield hasher(password)
+      })
+    yield r.dbCreate(serviceId.replace(/-/g, '_'))
+    let serviceResult = yield r.db(config.rethinkdb.db).table('services').insert({name: service, serviceId: serviceId})
+    let data = yield r.db(config.rethinkdb.db).table('services').get(serviceResult.generated_keys[0])
+    this.body = data
   }
 }
 

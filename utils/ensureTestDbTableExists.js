@@ -11,9 +11,14 @@ export default function * (next) {
   }
 
   let tableList = yield r.db(config.rethinkdb.db).tableList()
-  let isTableExists = tableList.indexOf('accounts') === -1 ? false : true
-  if (!isTableExists) {
+  let isAccountTableExists = tableList.indexOf('accounts') === -1 ? false : true
+  if (!isAccountTableExists) {
     let tableCreateResult = yield r.db(config.rethinkdb.db).tableCreate('accounts')
+  }
+
+  let isServiceTableExists = tableList.indexOf('services') === -1 ? false : true
+  if (!isServiceTableExists) {
+    let tableCreateResult = yield r.db(config.rethinkdb.db).tableCreate('services')
   }
   yield next
 }
