@@ -4,7 +4,7 @@ import config from '../config'
 import parse from 'co-body'
 
 import Debug from 'debug'
-let debug = Debug('meals')
+let debug = Debug('meepcloud:objects')
 
 let r = rethinkdbdash(config.rethinkdb)
 
@@ -33,6 +33,7 @@ function * create (next) {
   let body = yield parse.json(this)
   let token = this.header['x-meepcloud-access-token']
   let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
+  debug(body)
   this.body = yield r.db(appid).table(this.params.object).insert(body).run()
   yield next
 }

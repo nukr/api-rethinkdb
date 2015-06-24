@@ -14,8 +14,8 @@ const redis = new Redis(config.redis.port, config.redis.host)
 const r = rethinkdbdash({host: config.rethinkdb.host})
 let router = Router();
 
-router.post('/signin', signin);
-router.post('/signup', signup);
+router.post('/signin', signin)
+router.post('/signup', signup)
 
 function * signin() {
   let {username, password} = yield parse.json(this)
@@ -31,9 +31,6 @@ function * signin() {
     debug('duplicate user found, need to elimination')
   } else if (foundUser.length === 1) {
     debug('成功登入')
-    // let token = jwt.sign({test: 'success'}, 'shhhhh')
-    // redis.set(token, 1)
-    // redis.expire(token, 120)
     let services = yield r.db(config.rethinkdb.db).table('services').filter({serviceOwner: foundUser.id})
     this.body = {
       foundUser,
@@ -50,7 +47,7 @@ function * signin() {
 function * signup () {
   let {username, password, service} = yield parse.json(this)
   if (yield isUsernameExists(username)) {
-    this.body = 'user exists'
+    this.body = {status: "user exists"}
   } else {
     let serviceId = uuid.v4()
     let userResult = yield r
