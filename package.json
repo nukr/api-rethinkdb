@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec 'babel-node --stage 0' app.js"
+    "start": "babel-node --stage 0 utils/ensureTestDbTableExists.js && nodemon --exec 'babel-node --stage 0' app.js"
   },
   "author": "nukr",
   "license": "ISC",

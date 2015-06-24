@@ -5,7 +5,6 @@ import responseTime from 'koa-response-time';
 import config from './config';
 import routes from './routes';
 import cors from 'koa-cors';
-import ensureTestDbTableExists from './utils/ensureTestDbTableExists'
 import verifyToken from './utils/verifyToken'
 
 let debug = Debug('meepcloud:app')
@@ -14,7 +13,6 @@ let app = koa();
 
 app.use(logger())
 app.use(verifyToken)
-app.use(ensureTestDbTableExists)
 app.use(responseTime())
 app.use(cors())
 app.use(routes)

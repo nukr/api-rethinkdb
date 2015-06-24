@@ -12,9 +12,9 @@ router.post('/classes', create)
 
 function * create (next) {
   let token = this.header['x-meepcloud-access-token']
-  let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
+  let serviceId = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
   let body = yield parse.json(this)
-  let result = yield r.db(appid).tableCreate(body.name)
+  let result = yield r.db(serviceId).tableCreate(body.name)
   this.body = result
   yield next
 }

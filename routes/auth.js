@@ -27,15 +27,18 @@ function * signin() {
         username: username,
         password: yield hasher(password)
       })
-      .pluck('services')
   if (foundUser.length > 1) {
     debug('duplicate user found, need to elimination')
   } else if (foundUser.length === 1) {
     debug('成功登入')
-    let token = jwt.sign({test: 'success'}, 'shhhhh')
-    redis.set(token, 1)
-    redis.expire(token, 120)
-    this.body = foundUser
+    // let token = jwt.sign({test: 'success'}, 'shhhhh')
+    // redis.set(token, 1)
+    // redis.expire(token, 120)
+    let services = yield r.db(config.rethinkdb.db).table('services').filter({serviceOwner: foundUser.id})
+    this.body = {
+      foundUser,
+      services
+    }
   } else if (foundUser.length === 0) {
     debug('使用者不存在或帳號密碼錯誤')
   } else {
@@ -50,7 +53,7 @@ function * signup () {
     this.body = 'user exists'
   } else {
     let serviceId = uuid.v4()
-    yield r
+    let userResult = yield r
       .db(config.rethinkdb.db)
       .table('accounts')
       .insert({
@@ -58,7 +61,15 @@ function * signup () {
         password: yield hasher(password)
       })
     yield r.dbCreate(serviceId.replace(/-/g, '_'))
-    let serviceResult = yield r.db(config.rethinkdb.db).table('services').insert({name: service, serviceId: serviceId})
+    let serviceResult =
+      yield r
+        .db(config.rethinkdb.db)
+        .table('services')
+        .insert({
+          name: service,
+          serviceId: serviceId,
+          serviceOwner: userResult.generated_keys[0]
+        })
     let data = yield r.db(config.rethinkdb.db).table('services').get(serviceResult.generated_keys[0])
     this.body = data
   }
