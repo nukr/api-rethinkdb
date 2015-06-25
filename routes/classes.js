@@ -1,11 +1,10 @@
 import Router from 'koa-router';
-import rethinkdbdash from 'rethinkdbdash'
+import r from '../utils/rdb'
 import parse from 'co-body'
 import config from '../config'
 import Debug from 'debug'
 
 let debug = Debug('meepcloud:classes')
-let r = rethinkdbdash(config.rethinkdb)
 
 let router = Router();
 router.get('/classes/:className', get)

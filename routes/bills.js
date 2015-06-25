@@ -1,12 +1,10 @@
-import rethinkdbdash from 'rethinkdbdash';
+import r from '../utils/rdb';
 import Router from 'koa-router';
 import moment from 'moment';
 import parse from 'co-body';
 import http from 'http';
 import co from 'co'
 import config from '../config'
-
-let r = rethinkdbdash(config.rethinkdb)
 
 let router = Router();
 router.get('/bills', get);

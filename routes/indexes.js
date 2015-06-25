@@ -1,14 +1,12 @@
 import Router from 'koa-router';
-import rethinkdbdash from 'rethinkdbdash'
+import r from '../utils/rdb'
 import config from '../config'
 import parse from 'co-body'
-
 import Debug from 'debug'
+
 let debug = Debug('meepcloud:indexes')
-
-let r = rethinkdbdash({host: config.rethinkdb.host})
-
 let router = Router();
+
 router.get('/indexes/:tableName', getAll)
 router.post('/indexes/:tableName/:indexName', create)
 router.del('/indexes/:tableName/:indexName', del)

@@ -1,14 +1,12 @@
 import Router from 'koa-router';
-import rethinkdbdash from 'rethinkdbdash'
+import r from '../utils/rdb'
 import config from '../config'
 import parse from 'co-body'
-
 import Debug from 'debug'
+
 let debug = Debug('meepcloud:objects')
-
-let r = rethinkdbdash(config.rethinkdb)
-
 let router = Router();
+
 router.get('/objects/:object/:id', get)
 router.get('/objects/:object', getAll)
 router.post('/objects/:object', create)

@@ -9,18 +9,16 @@ import verifyToken from './utils/verifyToken'
 
 let debug = Debug('meepcloud:app')
 let app = koa();
+let env = process.env.NODE_ENV || 'development'
 
-
-app.use(logger())
+if (env === 'development') app.use(logger())
 app.use(verifyToken)
 app.use(responseTime())
 app.use(cors())
 app.use(routes)
 
 app.on('error', (err, ctx) => {
-  debug('server error', err);
+  console.log(err)
 });
 
-app.listen(config.koa.port);
-console.log(`koa server start at ${config.koa.port}`);
-
+export default app

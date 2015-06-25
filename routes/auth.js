@@ -2,20 +2,20 @@ import Router from 'koa-router';
 import parse from 'co-body'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
-import rethinkdbdash from 'rethinkdbdash'
 import co from 'co'
 import Redis from 'ioredis'
 import uuid from 'node-uuid'
 import config from '../config'
 import Debug from 'debug'
+import r from '../utils/rdb'
 
 const debug = Debug('meepcloud:auth')
 const redis = new Redis(config.redis.port, config.redis.host)
-const r = rethinkdbdash({host: config.rethinkdb.host})
 let router = Router();
 
 router.post('/signin', signin)
 router.post('/signup', signup)
+router.del('/users/:userId', del)
 
 function * signin() {
   let {username, password} = yield parse.json(this)
@@ -58,18 +58,24 @@ function * signup () {
         password: yield hasher(password)
       })
     yield r.dbCreate(serviceId.replace(/-/g, '_'))
-    let serviceResult =
-      yield r
-        .db(config.rethinkdb.db)
-        .table('services')
-        .insert({
-          name: service,
-          serviceId: serviceId,
-          serviceOwner: userResult.generated_keys[0]
-        })
-    let data = yield r.db(config.rethinkdb.db).table('services').get(serviceResult.generated_keys[0])
-    this.body = data
+    let serviceResult = yield r
+      .db(config.rethinkdb.db)
+      .table('services')
+      .insert({
+        name: service,
+        serviceId: serviceId,
+        serviceOwner: userResult.generated_keys[0]
+      })
+    this.body = {
+      userId: userResult.generated_keys[0],
+      serviceId: serviceId
+    }
   }
+}
+
+function * del () {
+  let deleteResult = yield r.db(config.rethinkdb.db).table('accounts').get(this.params.userId).delete()
+  this.body = deleteResult
 }
 
 const hasher = (password) => {
@@ -88,4 +94,4 @@ const isUsernameExists = (username) => {
   })
 }
 
-export default router.middleware();
+export default router.middleware()

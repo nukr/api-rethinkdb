@@ -1,18 +1,19 @@
 {
   "name": "meepcloud-test",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --require utils/mochaBabel",
-    "start": "babel-node --stage 0 utils/ensureTestDbTableExists.js && nodemon --exec 'babel-node --stage 0' app.js"
+    "test": "NODE_ENV=test mocha --require utils/mochaBabel -w",
+    "start": "babel-node --stage 0 bin"
   },
   "author": "nukr",
-  "license": "ISC",
+  "license": "MIT",
   "repository": "https://github.com/nukr/meepcloud-test.git",
   "dependencies": {
     "co": "^4.5.2",
     "co-body": "^1.2.0",
+    "commander": "^2.8.1",
     "debug": "^2.2.0",
     "gulp": "^3.8.11",
     "ioredis": "^1.5.1",
