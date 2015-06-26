@@ -13,19 +13,15 @@ router.post('/classes', create)
 router.del('/classes/:className', del)
 
 function * create (next) {
-  let token = this.header['x-meepcloud-access-token']
-  let serviceId = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
   let body = yield parse.json(this)
-  let result = yield r.db(serviceId).tableCreate(body.name)
+  let result = yield r.db(this.meepcloudDbName).tableCreate(body.name)
   this.body = result
   yield next
 }
 
 function * get (next) {
-  let token = this.header['x-meepcloud-access-token']
-  let serviceId = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  let count = yield r.db(serviceId).table(this.params.className).count()
-  let indexes = yield r.db(serviceId).table(this.params.className).indexList()
+  let count = yield r.db(this.meepcloudDbName).table(this.params.className).count()
+  let indexes = yield r.db(this.meepcloudDbName).table(this.params.className).indexList()
   this.body = {
     count: count,
     indexes: indexes
@@ -34,16 +30,12 @@ function * get (next) {
 }
 
 function * getAll (next) {
-  let token = this.header['x-meepcloud-access-token']
-  let serviceId = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  this.body = yield r.db(serviceId).tableList()
+  this.body = yield r.db(this.meepcloudDbName).tableList()
   yield next
 }
 
 function * del (next) {
-  let token = this.header['x-meepcloud-access-token']
-  let serviceId = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  this.body = yield r.db(serviceId).tableDrop(this.params.className)
+  this.body = yield r.db(this.meepcloudDbName).tableDrop(this.params.className)
   yield next
 }
 

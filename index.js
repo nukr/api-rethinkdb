@@ -14,8 +14,17 @@ let env = process.env.NODE_ENV || 'development'
 if (env === 'development') app.use(logger())
 app.use(verifyToken)
 app.use(responseTime())
+app.use(function * (next) {
+  this.meepcloudToken = this.header['x-meepcloud-access-token']
+  yield next
+})
+app.use(function * (next) {
+  this.meepcloudDbName = this.header['x-meepcloud-service-id'] && this.header['x-meepcloud-service-id'].replace(/-/g, '_')
+  yield next
+})
 app.use(cors())
 app.use(routes)
+
 
 app.on('error', (err, ctx) => {
   console.log(err)

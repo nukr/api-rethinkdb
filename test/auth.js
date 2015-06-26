@@ -45,24 +45,45 @@ describe('auth', () => {
           .post('/signin')
           .send({username: username, password: "password1", service: "meepshop"})
       expect(result.ok).to.be.true
+      expect(result.body).to.contain.all.keys('user', 'services')
       done()
     }().catch(done)
   })
 })
 
 describe('/classes', () => {
+  it('create', (done) => {
+    async () => {
+      let result = await chai
+      .request(app.listen())
+      .post('/classes')
+      .set('X-Meepcloud-Service-Id', serviceId)
+      .send({name: 'test'})
+      done()
+    }().catch(done)
+  })
+
   it('getAll', (done) => {
     async () => {
-      let result = await chai.request(app.listen()).get('/classes').set('X-Meepcloud-Application-Id', serviceId)
-      console.log(result.error)
+      let result = await chai.request(app.listen()).get('/classes').set('X-Meepcloud-Service-Id', serviceId)
+      expect(result.body).to.be.eql(['test'])
+      done()
+    }().catch(done)
+  })
+
+  it('delete', (done) => {
+    async () => {
+      let result = await chai.request(app.listen()).del('/classes/test').set('X-Meepcloud-Service-Id', serviceId)
       done()
     }().catch(done)
   })
 })
 
 describe('/objects', () => {
-  it('test', (done) => {
+  it('getAll', (done) => {
     async () => {
+      let result = await chai.request(app.listen()).get('/objects/products').set('X-Meepcloud-Service-Id', serviceId)
+      console.log(result.body)
       done()
     }().catch(done)
   })
@@ -71,10 +92,7 @@ describe('/objects', () => {
 describe('/users', () => {
   it('delete', (done) => {
     async () => {
-      let result =
-        await chai
-          .request(app.listen())
-          .del(`/users/${userId}`)
+      let result = await chai.request(app.listen()).del(`/users/${userId}`)
       done()
     }().catch(done)
   })

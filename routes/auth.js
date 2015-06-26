@@ -19,7 +19,7 @@ router.del('/users/:userId', del)
 
 function * signin() {
   let {username, password} = yield parse.json(this)
-  let foundUser =
+  let user =
     yield r
       .db(config.rethinkdb.db)
       .table('accounts')
@@ -27,20 +27,20 @@ function * signin() {
         username: username,
         password: yield hasher(password)
       })
-  if (foundUser.length > 1) {
+  if (user.length > 1) {
     debug('duplicate user found, need to elimination')
-  } else if (foundUser.length === 1) {
+  } else if (user.length === 1) {
     debug('成功登入')
-    let services = yield r.db(config.rethinkdb.db).table('services').filter({serviceOwner: foundUser.id})
+    let services = yield r.db(config.rethinkdb.db).table('services').filter({serviceOwner: user.id})
     this.body = {
-      foundUser,
+      user,
       services
     }
-  } else if (foundUser.length === 0) {
+  } else if (user.length === 0) {
     debug('使用者不存在或帳號密碼錯誤')
   } else {
     debug('出現奇怪東西了')
-    debug(foundUser)
+    debug(user)
   }
 }
 
@@ -74,6 +74,13 @@ function * signup () {
 }
 
 function * del () {
+  let services = yield r.db(config.rethinkdb.db).table('services').filter({serviceOwner: this.params.userId})
+  let dbDroped = yield Promise.all(
+    services.map((s) => {
+      return r.dbDrop(s.serviceId.replace(/-/g, '_'))
+    })
+  )
+  let deleted = yield r.db(config.rethinkdb.db).table('services').filter({serviceOwner: this.params.userId}).delete()
   let deleteResult = yield r.db(config.rethinkdb.db).table('accounts').get(this.params.userId).delete()
   this.body = deleteResult
 }
