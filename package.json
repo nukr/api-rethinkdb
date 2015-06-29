@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha --require utils/mochaBabel -w",
+    "test": "babel-node --stage 0 utils/ensureTestDbTableExists && NODE_ENV=test mocha --require utils/mochaBabel -w",
     "start": "babel-node --stage 0 utils/ensureTestDbTableExists && babel-node --stage 0 bin"
   },
   "author": "nukr",

@@ -3,6 +3,7 @@ import chaiHttp from 'chai-http'
 import co from 'co'
 import app from '../'
 import uuid from 'node-uuid'
+import r from 'rethinkdb'
 
 let accessToken = null
 let serviceId = null
@@ -70,27 +71,55 @@ describe('/classes', () => {
       done()
     }().catch(done)
   })
+})
 
-  it('delete', (done) => {
+
+describe('/objects', () => {
+  it('create', (done) => {
+    async () => {
+      let result = await chai
+      .request(app.listen())
+      .post('/objects/test')
+      .send({name: 'gg'})
+      .set('X-Meepcloud-Service-Id', serviceId)
+      done()
+    }().catch(done)
+  })
+  it('getAll', (done) => {
+    async () => {
+      let result = await chai.request(app.listen()).get('/objects/test').set('X-Meepcloud-Service-Id', serviceId)
+      done()
+    }().catch(done)
+  })
+})
+
+describe('/query', () => {
+  it('post', (done) => {
+    async () => {
+      let reql = r.table('test').build()
+      let result = await chai
+      .request(app.listen())
+      .post('/objects/query')
+      .get('X-Meepcloud-Service-Id', serviceId)
+      .send({reql: reql})
+      done()
+    }().catch(done)
+  })
+})
+
+describe('cleanup', () => {
+  it('delete class', (done) => {
     async () => {
       let result = await chai.request(app.listen()).del('/classes/test').set('X-Meepcloud-Service-Id', serviceId)
       done()
     }().catch(done)
   })
-})
-
-describe('/objects', () => {
-  it('getAll', (done) => {
+  it('delete object', (done) => {
     async () => {
-      let result = await chai.request(app.listen()).get('/objects/products').set('X-Meepcloud-Service-Id', serviceId)
-      console.log(result.body)
       done()
     }().catch(done)
   })
-})
-
-describe('/users', () => {
-  it('delete', (done) => {
+  it('delete user', (done) => {
     async () => {
       let result = await chai.request(app.listen()).del(`/users/${userId}`)
       done()

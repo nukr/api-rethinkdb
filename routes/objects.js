@@ -15,39 +15,38 @@ router.del('/objects/:object/:id', del)
 
 function * get (next) {
   let token = this.header['x-meepcloud-access-token']
-  let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  this.body = yield r.db(appid).table(this.params.object).get(this.params.id).run()
+  let serviceId = this.header['x-meepcloud-service-id'].replace(/-/g, '_')
+  this.body = yield r.db(serviceId).table(this.params.object).get(this.params.id).run()
   yield next;
 }
 
 function * getAll (next) {
   let token = this.header['x-meepcloud-access-token']
-  let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  this.body = yield r.db(appid).table(this.params.object).run()
+  let serviceId = this.header['x-meepcloud-service-id'].replace(/-/g, '_')
+  this.body = yield r.db(serviceId).table(this.params.object).run()
   yield next;
 }
 
 function * create (next) {
   let body = yield parse.json(this)
   let token = this.header['x-meepcloud-access-token']
-  let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  debug(body)
-  this.body = yield r.db(appid).table(this.params.object).insert(body).run()
+  let serviceId = this.header['x-meepcloud-service-id'].replace(/-/g, '_')
+  this.body = yield r.db(serviceId).table(this.params.object).insert(body).run()
   yield next
 }
 
 function * update (next) {
   let body = yield parse.json(this)
   let token = this.header['x-meepcloud-access-token']
-  let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  this.body = yield r.db(appid).table(this.params.object).get(this.params.id).update(body).run()
+  let serviceId = this.header['x-meepcloud-service-id'].replace(/-/g, '_')
+  this.body = yield r.db(serviceId).table(this.params.object).get(this.params.id).update(body).run()
   yield next
 }
 
 function * del (next) {
   let token = this.header['x-meepcloud-access-token']
-  let appid = this.header['x-meepcloud-application-id'].replace(/-/g, '_')
-  this.body = yield r.db(appid).table(this.params.object).get(this.params.id).delete().run()
+  let serviceId = this.header['x-meepcloud-service-id'].replace(/-/g, '_')
+  this.body = yield r.db(serviceId).table(this.params.object).get(this.params.id).delete().run()
   yield next
 }
 
