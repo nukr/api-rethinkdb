@@ -8,10 +8,11 @@ let debug = Debug('meepcloud:query')
 let router = Router();
 
 router.post('/query', query)
+router.get('/query', query)
 
-function * (next) {
-  r.db(this.meepcloudDbName)
+function * query (next) {
+  this.body = 'hihi'
   yield next
 }
 
-export default router
+export default router.middleware()

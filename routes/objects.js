@@ -23,7 +23,20 @@ function * get (next) {
 function * getAll (next) {
   let token = this.header['x-meepcloud-access-token']
   let serviceId = this.header['x-meepcloud-service-id'].replace(/-/g, '_')
-  this.body = yield r.db(serviceId).table(this.params.object).run()
+  let rdb = r.db(serviceId).table(this.params.object)
+  if (this.query.where) {
+    let where = JSON.parse(this.query.where)
+    for (let field in where) {
+      for (let fn in where[field]) {
+        let result = yield rdb.filter((o) => {
+          return o(field)[fn](where[field][fn])
+        })
+        this.body = result
+      }
+    }
+  } else {
+    this.body = yield rdb
+  }
   yield next;
 }
 
@@ -51,4 +64,3 @@ function * del (next) {
 }
 
 export default router.middleware();
-
