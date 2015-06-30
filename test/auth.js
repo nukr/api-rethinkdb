@@ -156,6 +156,19 @@ describe('where', () => {
   })
 })
 
+describe('query', () => {
+  it('reql', (done) => {
+    async () => {
+      let result = await chai
+        .request(app.listen())
+        .post('/query')
+        .set('X-Meepcloud-Service-Id', serviceId)
+        .send({reql: r.table('qqqq').build()})
+      done()
+    }().catch(done)
+  })
+})
+
 describe('cleanup', () => {
   it('delete object', (done) => {
     async () => {

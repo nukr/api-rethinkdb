@@ -8,9 +8,10 @@ let debug = Debug('meepcloud:query')
 let router = Router();
 
 router.post('/query', query)
-router.get('/query', query)
 
 function * query (next) {
+  let body = yield parse(this)
+  console.log(body.reql)
   this.body = 'hihi'
   yield next
 }
