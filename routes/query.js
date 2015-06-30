@@ -3,6 +3,7 @@ import r from '../utils/rdb'
 import parse from 'co-body'
 import config from '../config'
 import Debug from 'debug'
+import reqlDriver from '../../reql-replay-driver'
 
 let debug = Debug('meepcloud:query')
 let router = Router();
@@ -11,8 +12,10 @@ router.post('/query', query)
 
 function * query (next) {
   let body = yield parse(this)
-  console.log(body.reql)
-  this.body = 'hihi'
+  reqlDriver.db({host: '192.168.184.5'})
+  let query = new reqlDriver(body)
+  let result = yield query.run()
+  this.body = result
   yield next
 }
 
