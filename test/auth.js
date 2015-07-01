@@ -163,9 +163,20 @@ describe('query', () => {
         .request(app.listen())
         .post('/query')
         .set('X-Meepcloud-Service-Id', serviceId)
-        .send(r.db('taipei_steak').table('meals').build())
+        .send(r.db('taipei_steak').table('test').build())
       done()
       expect(result.body).to.be.an('array')
+    }().catch(done)
+  })
+
+  it('unknown term', (done) => {
+    async () => {
+      let result = await chai
+        .request(app.listen())
+        .post('/query')
+        .set('X-Meepcloud-Service-Id', serviceId)
+        .send(r.dbCreate('test').build())
+      done()
     }().catch(done)
   })
 })

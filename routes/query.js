@@ -12,9 +12,14 @@ router.post('/query', query)
 
 function * query (next) {
   let body = yield parse(this)
-  reqlDriver.db({host: '192.168.184.5'})
+  reqlDriver.options(config.rethinkdb)
   let query = new reqlDriver(body, this.meepcloudDbName)
-  let result = yield query.run()
+  try {
+    console.log(query.run())
+    let result = yield query.run()
+  } catch (e) {
+    this.status = 500
+  }
   this.body = result
   yield next
 }

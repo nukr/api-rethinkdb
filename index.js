@@ -27,7 +27,7 @@ app.use(routes)
 
 
 app.on('error', (err, ctx) => {
-  console.log(err)
+  this.body = err
 });
 
 export default app
