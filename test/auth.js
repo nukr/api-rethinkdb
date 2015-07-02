@@ -1,5 +1,6 @@
 import chai, {expect} from 'chai'
 import chaiHttp from 'chai-http'
+import chaiAsPromised from 'chai-as-promised'
 import app from '../'
 import uuid from 'node-uuid'
 import r from 'rethinkdb'
@@ -11,6 +12,7 @@ let userId = null
 let objectId = null
 
 chai.use(chaiHttp)
+chai.use(chaiAsPromised)
 
 describe('auth', () => {
   it('/signup', (done) => {
@@ -157,27 +159,31 @@ describe('where', () => {
 })
 
 describe('query', () => {
-  it('reql', (done) => {
-    async () => {
-      let result = await chai
-        .request(app.listen())
-        .post('/query')
-        .set('X-Meepcloud-Service-Id', serviceId)
-        .send(r.db('taipei_steak').table('test').build())
-      done()
-      expect(result.body).to.be.an('array')
-    }().catch(done)
+  it('reql', () => {
+    let request = chai
+      .request(app.listen())
+      .post('/query')
+      .set('X-Meepcloud-Service-Id', serviceId)
+      .send(r.db('taipei_steak').table('test').build())
+    return expect(request).to.eventually.have.deep.property('body[0].qq', 88)
   })
 
-  it('unknown term', (done) => {
-    async () => {
-      let result = await chai
-        .request(app.listen())
-        .post('/query')
-        .set('X-Meepcloud-Service-Id', serviceId)
-        .send(r.dbCreate('test').build())
-      done()
-    }().catch(done)
+  it('unknown term', () => {
+    let request = chai
+      .request(app.listen())
+      .post('/query')
+      .set('X-Meepcloud-Service-Id', serviceId)
+      .send(r.dbCreate('test').build())
+    return expect(request).to.eventually.have.deep.property('error.text', 'unknown term')
+  })
+
+  it('illegal command [innerJoin]', () => {
+    let request = chai
+      .request(app.listen())
+      .post('/query')
+      .set('X-Meepcloud-Service-Id', serviceId)
+      .send(r.table('test').innerJoin(r.table('taipei_steak')).build())
+    return expect(request).to.eventually.have.deep.property('error.text', 'illegal command [innerJoin]')
   })
 })
 

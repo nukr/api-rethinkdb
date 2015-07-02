@@ -2,7 +2,8 @@ export default {
   rethinkdb: {
     host: 'localhost',
     port: 28015,
-    db: 'meepcloud_test'
+    db: 'meepcloud_test',
+    max: 300
   },
   redis: {
     host: 'localhost',

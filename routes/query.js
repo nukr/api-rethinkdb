@@ -15,12 +15,12 @@ function * query (next) {
   reqlDriver.options(config.rethinkdb)
   let query = new reqlDriver(body, this.meepcloudDbName)
   try {
-    console.log(query.run())
-    let result = yield query.run()
+    var result = yield query.run()
+    this.body = result
   } catch (e) {
     this.status = 500
+    this.message = e.message
   }
-  this.body = result
   yield next
 }
 
